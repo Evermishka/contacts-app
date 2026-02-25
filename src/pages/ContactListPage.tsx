@@ -1,33 +1,77 @@
-import { memo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { ContactCard } from 'src/components/ContactCard';
 import { FilterForm, FilterFormValues } from 'src/components/FilterForm';
 import { ContactDto } from 'src/types/dto/ContactDto';
-import { useAppSelector } from 'src/store/hooks';
+import { useAppDispatch, useAppSelector } from 'src/store/hooks';
+import { loadContactsAsync, loadGroupsAsync, reloadContactsAsync } from 'src/store/actions';
+import { ErrorIndicator, LoadingIndicator } from 'src/components/StatusIndicator';
 
 export const ContactListPage = memo(() => {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    // Загружаем контакты и группы при монтировании компонента
+    dispatch(loadContactsAsync());
+    dispatch(loadGroupsAsync());
+  }, [dispatch]);
+
   const contacts = useAppSelector((state) => state.contacts);
   const groups = useAppSelector((state) => state.groups);
-  const [contactsFiltered, setContactsFiltered] = useState<ContactDto[]>(contacts);
+  const {
+    loading: loadingContacts,
+    error: errorContacts,
+    errorMessage: errorMessageContatcts,
+  } = useAppSelector((state) => state.ui.contacts);
+  const {
+    loading: loadingGroups,
+    error: errorGroups,
+    errorMessage: errorMessageGroups,
+  } = useAppSelector((state) => state.ui.groups);
 
-  const onSubmit = (fv: Partial<FilterFormValues>) => {
+  const [filter, setFilter] = useState<Partial<FilterFormValues>>({});
+
+  const contactsFiltered = useMemo(() => {
     let findContacts: ContactDto[] = contacts;
 
-    if (fv.name) {
-      const fvName = fv.name.toLowerCase();
+    if (filter.name) {
+      const fvName = filter.name.toLowerCase();
       findContacts = findContacts.filter(({ name }) => name.toLowerCase().indexOf(fvName) > -1);
     }
 
-    if (fv.groupId) {
-      const groupContacts = groups.find(({ id }) => id === fv.groupId);
+    if (filter.groupId) {
+      const groupContacts = groups.find(({ id }) => id === filter.groupId);
 
       if (groupContacts) {
         findContacts = findContacts.filter(({ id }) => groupContacts.contactIds.includes(id));
       }
     }
 
-    setContactsFiltered(findContacts);
+    return findContacts;
+  }, [contacts, groups, filter]);
+
+  const handleRetry = () => {
+    dispatch(reloadContactsAsync());
+    dispatch(loadGroupsAsync());
   };
+
+  const onSubmit = (fv: Partial<FilterFormValues>) => {
+    setFilter(fv);
+  };
+
+  if (loadingContacts || loadingGroups) {
+    return <LoadingIndicator loading={loadingContacts || loadingGroups} message="Загрузка..." />;
+  }
+
+  if (errorContacts || errorGroups) {
+    return (
+      <ErrorIndicator
+        error={errorContacts || errorGroups}
+        errorMessage={errorMessageContatcts || errorMessageGroups}
+        onRetry={handleRetry}
+      />
+    );
+  }
 
   return (
     <Row xxl={1}>

@@ -1,3 +1,13 @@
-import { Dispatch, SetStateAction } from 'react';
+export interface EntityState {
+  loading: boolean;
+  error: boolean;
+  errorMessage?: string;
+}
 
-export type State<TState> = [TState, Dispatch<SetStateAction<TState>>];
+export interface UIState {
+  contacts: EntityState;
+  favorites: EntityState;
+  groups: EntityState;
+}
+
+export type EntityType = 'contacts' | 'favorites' | 'groups';
