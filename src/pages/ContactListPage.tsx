@@ -1,14 +1,17 @@
-import React, { memo, useState } from 'react';
-import { CommonPageProps } from './types';
+import { memo, useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { ContactCard } from 'src/components/ContactCard';
 import { FilterForm, FilterFormValues } from 'src/components/FilterForm';
 import { ContactDto } from 'src/types/dto/ContactDto';
+import { useAppSelector } from 'src/store/hooks';
 
-export const ContactListPage = memo<CommonPageProps>(({ contactsState, groupContactsState }) => {
-  const [contacts, setContacts] = useState<ContactDto[]>(contactsState[0]);
+export const ContactListPage = memo(() => {
+  const contacts = useAppSelector((state) => state.contacts);
+  const groups = useAppSelector((state) => state.groups);
+  const [contactsFiltered, setContactsFiltered] = useState<ContactDto[]>(contacts);
+
   const onSubmit = (fv: Partial<FilterFormValues>) => {
-    let findContacts: ContactDto[] = contactsState[0];
+    let findContacts: ContactDto[] = contacts;
 
     if (fv.name) {
       const fvName = fv.name.toLowerCase();
@@ -16,28 +19,24 @@ export const ContactListPage = memo<CommonPageProps>(({ contactsState, groupCont
     }
 
     if (fv.groupId) {
-      const groupContacts = groupContactsState[0].find(({ id }) => id === fv.groupId);
+      const groupContacts = groups.find(({ id }) => id === fv.groupId);
 
       if (groupContacts) {
         findContacts = findContacts.filter(({ id }) => groupContacts.contactIds.includes(id));
       }
     }
 
-    setContacts(findContacts);
+    setContactsFiltered(findContacts);
   };
 
   return (
     <Row xxl={1}>
       <Col className="mb-3">
-        <FilterForm
-          groupContactsList={groupContactsState[0]}
-          initialValues={{}}
-          onSubmit={onSubmit}
-        />
+        <FilterForm groupContactsList={groups} initialValues={{}} onSubmit={onSubmit} />
       </Col>
       <Col>
         <Row xxl={4} className="g-4">
-          {contacts.map((contact) => (
+          {contactsFiltered.map((contact) => (
             <Col key={contact.id}>
               <ContactCard contact={contact} withLink />
             </Col>

@@ -6,7 +6,7 @@ interface BreadcrumbsProps {
   pathNames: string[];
 }
 
-export const Breadcrumbs = memo<BreadcrumbsProps>(({ pathNames, some }) => {
+export const Breadcrumbs = memo<BreadcrumbsProps>(({ pathNames }) => {
   return (
     <Row>
       <Col className={'mb-4'}>
