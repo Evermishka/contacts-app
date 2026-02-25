@@ -3,6 +3,7 @@ import { thunk } from 'redux-thunk';
 import { contactsReducer, favoritesReducer, groupsReducer, uiReducer } from './reducers';
 import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import { composeWithDevTools } from '@redux-devtools/extension';
 
 const rootReducer = combineReducers({
   contacts: contactsReducer,
@@ -21,7 +22,7 @@ const persistConfig = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const persistedReducer = persistReducer<any, any>(persistConfig, rootReducer);
 
-export const store = createStore(persistedReducer, applyMiddleware(thunk));
+export const store = createStore(persistedReducer, composeWithDevTools(applyMiddleware(thunk)));
 
 export const persistor = persistStore(store);
 
