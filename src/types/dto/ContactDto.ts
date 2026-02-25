@@ -1,13 +1,13 @@
 export interface ContactDto {
   id: string;
   /** телефон */
-  phone: string
+  phone: string;
   /** имя */
-  name: string
+  name: string;
   /** дата рождения */
-  birthday: string
+  birthday: string;
   /** адрес */
-  address: string
+  address: string;
   /** фото */
-  photo: string
+  photo: string;
 }

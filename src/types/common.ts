@@ -1,5 +1,3 @@
-import {Dispatch, SetStateAction} from 'react';
+import { Dispatch, SetStateAction } from 'react';
 
-export type State<TState> = [
-  TState, Dispatch<SetStateAction<TState>>
-]
+export type State<TState> = [TState, Dispatch<SetStateAction<TState>>];

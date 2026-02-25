@@ -1,12 +1,12 @@
-import {ContactDto} from './ContactDto';
+import { ContactDto } from './ContactDto';
 
 export interface GroupContactsDto {
   id: string;
   /** Название */
-  name: string,
+  name: string;
   /** Описание группы */
-  description: string,
+  description: string;
   /** Фото */
-  photo: string,
-  contactIds: ContactDto['id'][]
+  photo: string;
+  contactIds: ContactDto['id'][];
 }
